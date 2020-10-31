@@ -21,12 +21,15 @@ deaths = [90,4000,16,3103,179,184,408,682,5,1023,43,319,688,259,37,11,2068,269,3
 
 # write your update damages function here:
 def damagesAll(damage_data):
+  conversion = {"M": 1000000,
+               "B": 1000000000}
+
   updated_damages = []
   for data in damage_data:
     if data[-1] == 'B':
-      data = float(data[:-1]) * 1000000000  
+      data = float(data[:-1]) * conversion["B"] 
     elif data[-1] == 'M':
-      data = float(data[:-1]) * 1000000 
+      data = float(data[:-1]) * conversion["M"]
     elif data == 'Damages not recorded' :
       data = 'Damages not recorded' 
     updated_damages.append(data)
@@ -49,11 +52,9 @@ hurricanes = hurricanes(names, months, years, max_sustained_winds, areas_affecte
 
 # write your construct hurricane by year dictionary function here:
 
-def hurricane_year():
+def hurricane_year(hurricanes):
   hurricane_year = {}
-  results = hurricanes(names, months, years, max_sustained_winds, areas_affected, updated_damages, deaths)
-  
-  for result in results.values():
+  for result in hurricanes.values():
     year = result['Year']
     if year not in hurricane_year:
       hurricane_year[year] = [result]
@@ -62,9 +63,7 @@ def hurricane_year():
   return hurricane_year
 
 
-#print(hurricane_year())
-
-
+print(hurricane_year(hurricanes))
 # write your count affected areas function here:
 def affected_areas_count(affected_areas):
   hurricane_affected_areas_count = {}
@@ -115,43 +114,26 @@ def hurricane_deaths(hurricane_records):
 
 # write your catgeorize by mortality function here:
 
-mortality_scale = {0: 0,
+
+def rate_mortality_scale(hurricane_records):
+  mortality_scale = {0: 0,
                    1: 100,
                    2: 500,
                    3: 1000,
                    4: 10000}
-def rate_mortality_scale(hurricane_records):
-  scale = {}
+  scale = {0:[],1:[],2:[],3:[],4:[],5:[]}
   for record in hurricane_records.values():
-    if record["Death"] == 0:
-      if 0 not in scale:
-        scale[0] = [record]
-      else:
+    if record["Death"] == mortality_scale[0]:
         scale[0].append(record)
-    if record["Death"] <= 100:
-      if 1 not in scale:
-        scale[1] = [record]
-      else:
+    if record["Death"] <= mortality_scale[1]:
         scale[1].append(record)
-    if record["Death"] <= 500:
-      if 2 not in scale:
-        scale[2] = [record]
-      else:
+    if record["Death"] <= mortality_scale[2]:
         scale[2].append(record)
-    if record["Death"] <= 1000:
-      if 3 not in scale:
-        scale[3] = [record]
-      else:
+    if record["Death"] <= mortality_scale[3]:
         scale[3].append(record)
-    if record["Death"] <= 10000:
-      if 4 not in scale:
-        scale[4] = [record]
-      else:
+    if record["Death"] <= mortality_scale[4]:
         scale[4].append(record)
-    if record["Death"] > 10000:
-      if 5 not in scale:
-        scale[5] = [record]
-      else:
+    if record["Death"] > mortality_scale[4]:
         scale[5].append(record)
   return scale
   
@@ -181,39 +163,22 @@ def damage_scale(hurricane_records):
                    2: 1000000000,
                    3: 10000000000,
                    4: 50000000000}
-  scale = {}
-  for record in hurricane_records.values():
-    if record["Damage"] != "Damages not recorded":
-     if record["Damage"] == damage_scale[0]:
-      if 0 not in scale:
-        scale[0] = [record]
-      else:
-        scale[0].append(record)
-     if record["Damage"] <= damage_scale[1]:
-      if 1 not in scale:
-        scale[1] = [record]
-      else:
-        scale[1].append(record)
-     if record["Damage"] <= damage_scale[2]:
-      if 2 not in scale:
-        scale[2] = [record]
-      else:
-        scale[2].append(record)
-     if record["Damage"] <= damage_scale[3]:
-      if 3 not in scale:
-        scale[3] = [record]
-      else:
-        scale[3].append(record)
-     if record["Damage"] <= damage_scale[4]:
-      if 4 not in scale:
-        scale[4] = [record]
-      else:
-        scale[4].append(record)
-     if record["Damage"] > damage_scale[4]:
-      if 5 not in scale:
-        scale[5] = [record]
-      else:
-        scale[5].append(record)
+  scale = {0:[],1:[],2:[],3:[],4:[],5:[]}
+  for record in hurricane_records:
+    damage_cost = hurricanes[record]['Damage']
+    if damage_cost != "Damages not recorded":
+     if damage_cost == damage_scale[0]:
+        scale[0].append(hurricanes[record])
+     elif damage_cost > damage_scale[0] and damage_cost <= damage_scale[1]:
+        scale[1].append(hurricanes[record])
+     elif damage_cost > damage_scale[1] and damage_cost <= damage_scale[2]:
+        scale[2].append(hurricanes[record])
+     elif damage_cost > damage_scale[2] and damage_cost <= damage_scale[3]:
+        scale[3].append(hurricanes[record])
+     elif damage_cost > damage_scale[3] and damage_cost <= damage_scale[4]:
+        scale[4].append(hurricanes[record])
+     elif damage_cost > damage_scale[4]:
+        scale[5].append(hurricanes[record])
   return scale
   
 print(damage_scale(hurricanes))
